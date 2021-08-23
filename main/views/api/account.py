@@ -1,11 +1,13 @@
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from django.views.decorators.http import require_GET, require_POST
+from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth import login, logout
 from main.serializer import master_data
 from django.http import JsonResponse
 from main.views import base_fuction
 from django.utils import timezone
 from rest_framework.status import (
+    HTTP_401_UNAUTHORIZED,
     HTTP_400_BAD_REQUEST,
     HTTP_404_NOT_FOUND,
     HTTP_200_OK,
@@ -20,8 +22,11 @@ from main.models import User, Validation
 # ----------------------------------------------------------------------------------------------------------------------------
 
 @csrf_exempt
-@api_view(["POST"])
-@permission_classes([AllowAny])
+def is_not_authenticated(request):
+    return JsonResponse({'message' : 'You are not authenticated.'}, status = HTTP_401_UNAUTHORIZED)
+
+@csrf_exempt
+@require_POST
 def send_verify_code(request):
     try:
         # get data
@@ -50,8 +55,7 @@ def send_verify_code(request):
 
 
 @csrf_exempt
-@api_view(["POST"])
-@permission_classes([AllowAny])
+@require_POST
 def signin(request):
     try:
         # get data
@@ -63,22 +67,28 @@ def signin(request):
         # check validation code
         if Validation.objects.filter(mobile = mobile_number, validation_code = validation_code).exists():
             register_status = False
-            access_token = None
             if User.objects.filter(mobile = mobile_number).exists():
                 register_status = True
                 # login user
-                base_url = 'http://127.0.0.1:8000'
-                url = base_url + '/oauth/token/'
-                data = {"grant_type": "password", "client_id": "M1y371MdyrYAJ5zWE3B6xUhmO00PDuIY9uyHnIKX", "username": mobile_number, "password": mobile_number}
-                response = requests.post(url, data = data)
-                result = response.json()
-                access_token = result['access_token']
+                this_user = User.objects.get(mobile = mobile_number)
+                login(request, this_user)
 
-                return JsonResponse({'message' : 'user is login', 'register': register_status, 'token': access_token} , status = HTTP_200_OK)
+                return JsonResponse({'message' : 'user is login', 'register': register_status} , status = HTTP_200_OK)
             else:
-                return JsonResponse({'message' : 'user is not register', 'register': register_status, 'token': access_token} , status = HTTP_200_OK)
+                return JsonResponse({'message' : 'user is not register', 'register': register_status} , status = HTTP_200_OK)
         else:
             return JsonResponse({'message' : 'the code or mobile number entered is incorrect.'} , status = HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        return JsonResponse({'message' : str(e)}, status = HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@csrf_exempt
+@require_POST
+@login_required(login_url = 'api:is_not_authenticated_api')
+def signout(request):
+    try:
+        logout(request)
+        return JsonResponse({'message' : 'user is logout'}, status = HTTP_200_OK, safe = False)
     except Exception as e:
         return JsonResponse({'message' : str(e)}, status = HTTP_500_INTERNAL_SERVER_ERROR)
 
@@ -100,8 +110,7 @@ def check_signup_fields(mobile, first_name, last_name, email):
 
 
 @csrf_exempt
-@api_view(["POST"])
-@permission_classes([AllowAny])
+@require_POST
 def signup(request):
     try:
         # get data
@@ -127,21 +136,16 @@ def signup(request):
             this_user.profile = user_profile
         this_user.save()
         # login user
-        base_url = 'http://127.0.0.1:8000'
-        url = base_url + '/oauth/token/'
-        data = {"grant_type": "password", "client_id": "M1y371MdyrYAJ5zWE3B6xUhmO00PDuIY9uyHnIKX", "username": user_mobile_number, "password": user_mobile_number}
-        response = requests.post(url, data = data)
-        result = response.json()
-        access_token = result['access_token']
+        login(request, this_user)
 
-        return JsonResponse({'message' : 'user is login', 'token': access_token} , status = HTTP_201_CREATED)
+        return JsonResponse({'message' : 'user is login'} , status = HTTP_201_CREATED)
     except Exception as e:
         return JsonResponse({'message' : str(e)}, status = HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 @csrf_exempt
-@api_view(["POST"])
-@permission_classes([IsAuthenticated])
+@require_POST
+@login_required(login_url = 'api:is_not_authenticated_api')
 def user_details(request):
     try:
         # get data

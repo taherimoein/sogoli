@@ -1,11 +1,12 @@
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from django.views.decorators.http import require_GET, require_POST
+from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from main.serializer import master_data
 from django.http import JsonResponse
 from main.views import base_fuction
 from django.utils import timezone
 from rest_framework.status import (
+    HTTP_401_UNAUTHORIZED,
     HTTP_400_BAD_REQUEST,
     HTTP_404_NOT_FOUND,
     HTTP_200_OK,
@@ -20,8 +21,8 @@ from main.models import User, BeautyShop
 # ----------------------------------------------------------------------------------------------------------------------------
 
 @csrf_exempt
-@api_view(["GET"])
-@permission_classes([IsAuthenticated])
+@require_GET
+@login_required(login_url = 'api:is_not_authenticated_api')
 def beautyshop_list(request):
     try:
         # get data
@@ -33,8 +34,8 @@ def beautyshop_list(request):
 
 
 @csrf_exempt
-@api_view(["POST"])
-@permission_classes([IsAuthenticated])
+@require_POST
+@login_required(login_url = 'api:is_not_authenticated_api')
 def beautyshops_information_with_search(request):
     try:
         # get data
@@ -57,8 +58,8 @@ def beautyshops_information_with_search(request):
 
 
 @csrf_exempt
-@api_view(["POST"])
-@permission_classes([IsAuthenticated])
+@require_POST
+@login_required(login_url = 'api:is_not_authenticated_api')
 def beautyshop_details(request):
     try:
         # get data

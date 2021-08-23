@@ -1,0 +1,14 @@
+{
+  "platform": "django",
+  "app": "sogoli",
+  "disks": [
+    {
+      "name": "sogoli-media",
+      "mountTo": "media"
+    },
+    {
+      "name": "sogoli-static",
+      "mountTo": "staticfiles"
+    }
+  ]
+}

@@ -41,8 +41,7 @@ DJANGO_DEFAULT_APPS = [
 ]
 
 THIRD_PARTY_APPS = [
-    'rest_framework',
-    'oauth2_provider'
+    'rest_framework'
 ]
 
 LOCAL_APPS = [
@@ -86,14 +85,26 @@ WSGI_APPLICATION = 'sogoli.wsgi.application'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
 # Postgersql Local DB
+# DATABASES = {
+#     'default': {
+#     'ENGINE': 'django.db.backends.postgresql',
+#     'NAME': 'dbsogoli',
+#     'USER': 'postgres',
+#     'PASSWORD': 'moein@taheri',
+#     'HOST' : 'localhost',
+#     'PORT' : '5432',
+#     }
+# }
+
+# Postgersql Liara DB
 DATABASES = {
     'default': {
-    'ENGINE': 'django.db.backends.postgresql',
-    'NAME': 'dbsogoli',
-    'USER': 'postgres',
-    'PASSWORD': 'moein@taheri',
-    'HOST' : 'localhost',
-    'PORT' : '5432',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'dbsogoli',
+        'USER': 'root',
+        'PASSWORD': 'n33hB0KLxlw2u7f2qXlsczcd',
+        'HOST' : 'arthur.iran.liara.ir',
+        'PORT' : '30689',
     }
 }
 
@@ -150,20 +161,8 @@ MEDIA_URL = '/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-OAUTH2_PROVIDER = {
-    # this is the list of available scopes
-    'SCOPES': {'read': 'Read scope', 'write': 'Write scope', 'groups': 'Access to your groups'},
-    'OAUTH_BACKEND_CLASS' : 'oauth2_provider.oauth2_backends.JSONOAuthLibCore',
-    'ACCESS_TOKEN_EXPIRE_SECONDS': 86400,
-}
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.IsAuthenticated',
-    ),
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
-        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
-        'rest_framework.authentication.SessionAuthentication',
-        'rest_framework.authentication.BasicAuthentication',
-    ),
+        'rest_framework.permissions.DEFAULT_PERMISSION_CLASSES',
+    )
 }
