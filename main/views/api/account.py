@@ -144,7 +144,7 @@ def signup(request):
 
 
 @csrf_exempt
-@require_POST
+@require_GET
 @login_required(login_url = 'api:is_not_authenticated_api')
 def user_details(request):
     try:
