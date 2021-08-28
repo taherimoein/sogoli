@@ -73,9 +73,9 @@ def signin(request):
                 this_user = User.objects.get(mobile = mobile_number)
                 login(request, this_user)
 
-                return JsonResponse({'message' : 'user is login', 'register': register_status} , status = HTTP_200_OK)
+                return JsonResponse({'message' : 'user is login', 'register': register_status, 'id': this_user.id} , status = HTTP_200_OK)
             else:
-                return JsonResponse({'message' : 'user is not register', 'register': register_status} , status = HTTP_200_OK)
+                return JsonResponse({'message' : 'user is not register', 'register': register_status, 'id': this_user.id} , status = HTTP_200_OK)
         else:
             return JsonResponse({'message' : 'the code or mobile number entered is incorrect.'} , status = HTTP_400_BAD_REQUEST)
     except Exception as e:
@@ -138,7 +138,7 @@ def signup(request):
         # login user
         login(request, this_user)
 
-        return JsonResponse({'message' : 'user is login'} , status = HTTP_201_CREATED)
+        return JsonResponse({'message' : 'user is login', 'id': this_user.id} , status = HTTP_201_CREATED)
     except Exception as e:
         return JsonResponse({'message' : str(e)}, status = HTTP_500_INTERNAL_SERVER_ERROR)
 
@@ -148,14 +148,8 @@ def signup(request):
 @login_required(login_url = 'api:is_not_authenticated_api')
 def user_details(request):
     try:
-        # get data
-        user_id = request.POST.get('id')
-        # search in users
-        if User.objects.filter(id = user_id, active = True).exists():
-            this_user = User.objects.get(id = user_id)
-            serializer = master_data.UserDetailsSerializer(this_user)
-            return JsonResponse(serializer.data, status = HTTP_200_OK, safe = False)
-        else:
-            return JsonResponse({'message': 'there is no user with this ID.'}, status = HTTP_404_NOT_FOUND)
+        this_user = request.user
+        serializer = master_data.UserDetailsSerializer(this_user)
+        return JsonResponse(serializer.data, status = HTTP_200_OK, safe = False)
     except Exception as e:
         return JsonResponse({'error': str(e)}, status = HTTP_500_INTERNAL_SERVER_ERROR)
