@@ -144,12 +144,17 @@ def signup(request):
 
 
 @csrf_exempt
-@require_GET
+@require_POST
 @login_required(login_url = 'api:is_not_authenticated_api')
 def user_details(request):
     try:
-        this_user = request.user
-        serializer = master_data.UserDetailsSerializer(this_user)
-        return JsonResponse(serializer.data, status = HTTP_200_OK, safe = False)
+        # get data
+        user_id = request.POST.get('id')
+        if User.objects.filter(id = user_id).exists():
+            this_user = User.objects.get(id = user_id)
+            serializer = master_data.UserDetailsSerializer(this_user)
+            return JsonResponse(serializer.data, status = HTTP_200_OK, safe = False)
+        else:
+            return JsonResponse({'message': 'There is no user with this ID in the system.'}, status = HTTP_404_NOT_FOUND)
     except Exception as e:
         return JsonResponse({'error': str(e)}, status = HTTP_500_INTERNAL_SERVER_ERROR)

@@ -1,4 +1,4 @@
-from main.views.api import account, main
+from main.views.api import account, main, order
 from django.urls import path
 
 # -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -17,4 +17,9 @@ urlpatterns = [
     path('beautyshops/', main.beautyshop_list, name = 'beautyshops_api'),
     path('search-in-beautyshops/', main.beautyshops_information_with_search, name = 'beautyshops_information_with_search_api'),
     path('beautyshop-details/', main.beautyshop_details, name = 'beautyshop_details_api'),
+    path('follow-beautyshop/', main.follow_beautyshop, name = 'follow_beautyshop_api'),
+    # order api
+    path('create-order/', order.create_order, name = 'create_order_api'),
+    path('user-orders/', order.user_orders, name = 'user_orders_api'),
+    path('beautyshop-orders/', order.beautyshop_orders, name = 'beautyshop_orders_api'),
 ]

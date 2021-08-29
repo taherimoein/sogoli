@@ -76,3 +76,36 @@ def beautyshop_details(request):
             return JsonResponse({'message': 'there is no beauty salon with this ID.'}, status = HTTP_404_NOT_FOUND)
     except Exception as e:
         return JsonResponse({'error': str(e)}, status = HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@csrf_exempt
+@require_POST
+@login_required(login_url = 'api:is_not_authenticated_api')
+def follow_beautyshop(request):
+    try:
+        # get data
+        user_id = request.POST.get('user_id')
+        beautyshop_id = request.POST.get('beautyshop_id')
+        # create order
+        user = User.objects.get(id = user_id)
+        beautyshop = BeautyShop.objects.get(id = beautyshop_id)
+        if user.beautyshop_following.filter(id = beautyshop.id).exists():
+            user.beautyshop_following.remove(beautyshop)
+            # add follow count
+            if user.following_count > 0:
+                user.following_count -= 1
+                user.save()
+            if beautyshop.following_count > 0:
+                beautyshop.following_count -= 1
+                beautyshop.save()
+            return JsonResponse({'message' : 'unfollow'}, status = HTTP_200_OK)
+        else:
+            user.beautyshop_following.add(beautyshop)
+            # add follow count
+            user.following_count += 1
+            user.save()
+            beautyshop.following_count += 1
+            beautyshop.save()
+            return JsonResponse({'message' : 'follow'}, status = HTTP_200_OK)
+    except Exception as e:
+        return JsonResponse({'message' : str(e)}, status = HTTP_500_INTERNAL_SERVER_ERROR)
