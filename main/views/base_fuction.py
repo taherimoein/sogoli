@@ -46,13 +46,14 @@ def send_sms(to_number, verify_code):
         api = kavenegar.KavenegarAPI(
             '2B485230622F74625978584E343167657576785041736B4A586D6E524C4661577A56566B44366D674C75413D')
         params = {
+            'sender': '10003004002000',
             'receptor': to_number,
-            # sogoli-verify-code
-            'template': 'verify-code',
-            'token': verify_code,
-            'type': 'sms',
+            # 'template': 'verify-code',
+            # 'token': verify_code,
+            # 'type': 'sms',
+            'message': 'سوگلی\nکد احراز هویت شما : ' + verify_code
         }
-        api.verify_lookup(params)
+        api.sms_send(params)
         return True, None
     except Exception as e:
         return False, str(e)
