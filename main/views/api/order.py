@@ -39,7 +39,7 @@ def create_order(request):
             total_price += int(item['price'])
         order_status = True
         if payment_status == '0':
-            order_status = True
+            order_status = False
         Order.objects.create(fk_user = user, fk_beautyshop =  beautyshop,\
             services = services, total_price = total_price, reservation_date = order_datetime,
             payment_status = order_status)
